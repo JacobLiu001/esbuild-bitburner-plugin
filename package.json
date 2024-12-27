@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "chokidar": "^3.6.0",
+    "minimatch": "^10.0.1",
     "websocket": "^1.0.35"
   }
 }

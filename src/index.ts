@@ -45,6 +45,10 @@ export type BitburnerPluginOptions = Partial<{
     [path: string]: string[] | 'all' | 'own' | 'other';
   };
   /**
+   * A list of files/folders to ignore when mirroring or distributing.
+   */
+  ignorePaths: string[];
+  /**
    * A list of extensions for the Plugin to supplement and customize features.
    */
   extensions: {

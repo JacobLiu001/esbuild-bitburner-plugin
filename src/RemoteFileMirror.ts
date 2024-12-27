@@ -5,13 +5,16 @@ import { FSWatcher, watch as watchDirectory } from 'chokidar';
 import { RemoteApiServer } from './RemoteApiServer';
 import { BitburnerPluginOptions } from '.';
 import { createLogBatch } from './lib/log';
+import { Minimatch } from 'minimatch';
 
 
 export class RemoteFileMirror {
   static remoteApi: RemoteApiServer;
+  static MINIMATCH_OPTIONS = {};
 
   servers!: string[];
   targetPath!: string;
+  ignorePaths!: Minimatch[];
   fileCache: Record<string, string> = {};
   syncing = false;
   remotePollTimeout: NodeJS.Timeout | undefined;
@@ -33,6 +36,7 @@ export class RemoteFileMirror {
         }) :
       servers;
 
+    mirror.ignorePaths = (options.ignorePaths ?? []).map(p => new Minimatch(p, RemoteFileMirror.MINIMATCH_OPTIONS));
     mirror.targetPath = targetPath;
     mirror.options = options;
     console.log(`Creating mirror [${mirror.servers.join(', ')}] => ${targetPath}`);
@@ -52,6 +56,9 @@ export class RemoteFileMirror {
 
     for (const file of files) {
       const filePath = path.join(file.path, file.name).replaceAll('\\', '/');
+      if (this.ignorePaths.some(p => p.match(filePath))) {
+        continue;
+      }
       const content = (await fs.readFile(filePath)).toString('utf8');
       const remoteUrl = filePath.replace(this.targetPath, '').replace(/\/?(.*?)\//, '$1://');
       this.fileCache[remoteUrl] = content;
@@ -103,6 +110,9 @@ export class RemoteFileMirror {
       if (!serverFiles) continue;
 
       for (const { filename, content } of serverFiles.result) {
+        if (this.ignorePaths.some(p => p.match(filename))) {
+          continue;
+        }
         files[`${server}://${filename}`] = content;
       }
 
@@ -142,8 +152,13 @@ export class RemoteFileMirror {
     const logger = createLogBatch();
     try { //wrap in async iife to gurantee syncing is false after function return
 
-      const files = await this.getAllServerFiles();
-      if (!files) return;
+      const all_files = await this.getAllServerFiles();
+      if (!all_files) return;
+
+      const files = Object.keys(all_files).filter(key => !this.ignorePaths.some(p => p.match(key))).reduce((obj, key) => {
+        return { ...obj, [key]: all_files[key] };
+      }, {});
+
       const { mod: filesToWrite, rem: filesToRemove } = this.compareFilesToCache(files);
 
       this.writeToFilesCache(files);
@@ -234,6 +249,7 @@ export class RemoteFileMirror {
 
       const remoteServer = sanitizedFilePath.replace(this.targetPath, '').replace(/\/?(.*?)\/.*/, '$1');
       const remotePath = sanitizedFilePath.replace(this.targetPath, '').replace(`/${remoteServer}/`, '');
+      if (this.ignorePaths.some(p => p.match(remotePath))) return;
 
       const file = await RemoteFileMirror.remoteApi.getFile({
         filename: remotePath,
