@@ -1,7 +1,7 @@
 {
   "name": "esbuild-bitburner-plugin",
   "version": "1.6.2",
-  "description": "plugin to push files compiled by esbuild directly to bitburner using its remote API",
+  "description": "[FORK] plugin to push files compiled by esbuild directly to bitburner using its remote API",
   "main": "build/index.js",
   "scripts": {
     "dev": "node build.mjs --watch",
@@ -10,20 +10,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shyguy1412/esbuild-bitburner-plugin.git"
+    "url": "git+https://github.com/JacobLiu001/esbuild-bitburner-plugin.git"
   },
   "keywords": [
     "esbuild"
   ],
   "author": "Nils Ramstöck",
+  "contributors": ["Jacob Liu"],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shyguy1412/esbuild-bitburner-plugin/issues"
+    "url": "https://github.com/JacobLiu001/esbuild-bitburner-plugin/issues"
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "homepage": "https://github.com/shyguy1412/esbuild-bitburner-plugin#readme",
+  "homepage": "https://github.com/JacobLiu001/esbuild-bitburner-plugin#readme",
   "devDependencies": {
     "@types/node": "^22.5.4",
     "@types/websocket": "^1.0.10",
