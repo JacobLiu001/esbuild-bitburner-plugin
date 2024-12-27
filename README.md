@@ -1,6 +1,6 @@
 # esbuild-bitburner-plugin
 
-This is an ESBuild plugin that uses Bitburners remote API to push the build results into the game.
+This is an ESBuild plugin that uses Bitburners remote API to push the build results into the game, patched by [JacobLiu](https://github.com/JacobLiu001/) to ignore some files in mirroring mode.
 
 If you are looking for a ready to go template for your workspace, have a look at [bb-external-editor](https://github.com/shyguy1412/bb-external-editor).
 
